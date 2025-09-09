@@ -37,9 +37,8 @@ export default function Home() {
   const animRef = useRef(null);
 
   useEffect(() => {
-    // place default start/goal
     setGrid((g) => {
-      const ng = g.map(row => row.map(cell => ({ ...cell })));
+      const ng = g.map((row) => row.map((cell) => ({ ...cell })));
       ng[startRef.current.r][startRef.current.c].start = true;
       ng[goalRef.current.r][goalRef.current.c].goal = true;
       return ng;
@@ -52,7 +51,7 @@ export default function Home() {
       animRef.current = null;
     }
     setRunning(false);
-    setGrid((g) => g.map(row => row.map(cell => ({ ...cell, visited: false, onPath: false }))));
+    setGrid((g) => g.map((row) => row.map((cell) => ({ ...cell, visited: false, onPath: false }))));
   }
 
   function hardReset() {
@@ -62,10 +61,9 @@ export default function Home() {
     }
     setRunning(false);
     setGrid(emptyGrid());
-    // re-place defaults next tick
     setTimeout(() => {
       setGrid((g) => {
-        const ng = g.map(row => row.map(cell => ({ ...cell })));
+        const ng = g.map((row) => row.map((cell) => ({ ...cell })));
         ng[startRef.current.r][startRef.current.c].start = true;
         ng[goalRef.current.r][goalRef.current.c].goal = true;
         return ng;
@@ -73,21 +71,36 @@ export default function Home() {
     }, 0);
   }
 
+  // Click handler (respects mode)
   function handleCellClick(r, c) {
     if (running) return;
     setGrid((g) => {
-      const ng = g.map(row => row.map(cell => ({ ...cell })));
+      const ng = g.map((row) => row.map((cell) => ({ ...cell })));
       if (mode === "start") {
-        ng.forEach(row => row.forEach(cell => (cell.start = false)));
+        ng.forEach((row) => row.forEach((cell) => (cell.start = false)));
         ng[r][c].start = true;
         startRef.current = { r, c };
       } else if (mode === "goal") {
-        ng.forEach(row => row.forEach(cell => (cell.goal = false)));
+        ng.forEach((row) => row.forEach((cell) => (cell.goal = false)));
         ng[r][c].goal = true;
         goalRef.current = { r, c };
       } else {
-        // toggle wall unless start/goal
+        // wall mode uses onWallPaint instead
         if (!ng[r][c].start && !ng[r][c].goal) ng[r][c].wall = !ng[r][c].wall;
+      }
+      return ng;
+    });
+  }
+
+  // Drag painting walls only (never moves start/goal)
+  function onWallPaint(r, c) {
+    if (running) return;
+    setGrid((g) => {
+      const ng = g.map((row) => row.map((cell) => ({ ...cell })));
+      const cell = ng[r][c];
+      if (!cell.start && !cell.goal) {
+        cell.wall = !cell.wall; // force paint "on" while dragging
+        // If you'd prefer toggling while dragging, use: cell.wall = !cell.wall;
       }
       return ng;
     });
@@ -100,7 +113,7 @@ export default function Home() {
     setRunning(true);
 
     const payload = {
-      grid: grid.map(row => row.map(cell => (cell.wall ? 1 : 0))),
+      grid: grid.map((row) => row.map((cell) => (cell.wall ? 1 : 0))),
       start: startRef.current,
       goal: goalRef.current,
     };
@@ -118,17 +131,16 @@ export default function Home() {
       if (i < visitedOrder.length) {
         const { r, c } = visitedOrder[i++];
         setGrid((g) => {
-          const ng = g.map(row => row.map(cell => ({ ...cell })));
+          const ng = g.map((row) => row.map((cell) => ({ ...cell })));
           if (!ng[r][c].start && !ng[r][c].goal && !ng[r][c].wall) ng[r][c].visited = true;
           return ng;
         });
         animRef.current = setTimeout(step, speed);
       } else {
-        // ---- Unreachable-goal guard BEFORE reconstructing path ----
+        // unreachable-goal guard
         const key = (n) => `${n.r},${n.c}`;
         const goalKey = key(goalRef.current);
         if (!parent[goalKey]) {
-          // No path found; just stop gracefully.
           setRunning(false);
           return;
         }
@@ -143,7 +155,7 @@ export default function Home() {
           if (curKey === key(startRef.current)) break;
         }
         setGrid((g) => {
-          const ng = g.map(row => row.map(cell => ({ ...cell })));
+          const ng = g.map((row) => row.map((cell) => ({ ...cell })));
           path.forEach(({ r, c }) => {
             if (!ng[r][c].start && !ng[r][c].goal) ng[r][c].onPath = true;
           });
@@ -186,11 +198,17 @@ export default function Home() {
           />
 
           <div style={{ marginTop: 12 }}>
-            <Grid grid={grid} onCellClick={handleCellClick} running={running} />
+            <Grid
+              grid={grid}
+              mode={mode}
+              running={running}
+              onCellClick={handleCellClick}
+              onWallPaint={onWallPaint}
+            />
           </div>
 
           <p style={{ marginTop: 12, opacity: 0.7 }}>
-            Tip: switch modes to set <b>Start</b>/<b>Goal</b> or paint <b>Walls</b>, then run BFS/DFS.
+            Tip: switch modes to set <b>Start</b>/<b>Goal</b> or hold the mouse to <b>draw Walls</b>, then run BFS/DFS.
           </p>
         </main>
 

@@ -5,11 +5,11 @@
 
   /* added semantic colors for the visualizer */
   --cell-border: #e5e7eb;
-  --cell-wall: #1f2937;
-  --cell-visited: #93c5fd;
-  --cell-path: #60a5fa;
-  --cell-start: #22c55e;
-  --cell-goal: #ef4444;
+  --cell-wall: #0b1020;      /* darker, bluer wall */
+  --cell-visited: #8ec5ff;   /* light blue */
+  --cell-path: #f59e0b;      /* bright amber for final path */
+  --cell-start: #16a34a;     /* green */
+  --cell-goal: #ef4444;      /* red */
 
   --panel-border: #e5e7eb;
   --panel-bg: #fafafa;
@@ -24,11 +24,12 @@
     --foreground: #ededed;
 
     --cell-border: #2a2a2a;
-    --cell-wall: #111827;
-    --cell-visited: #2563eb; /* slightly deeper for contrast */
-    --cell-path: #1d4ed8;
+    --cell-wall: #0a0f1a;     /* even darker in dark mode */
+    --cell-visited: #3b82f6;  /* stronger blue */
+    --cell-path: #f59e0b;     /* keep bright amber */
     --cell-start: #16a34a;
     --cell-goal: #dc2626;
+
 
     --panel-border: #2a2a2a;
     --panel-bg: #111111;
