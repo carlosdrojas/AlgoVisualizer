@@ -1,12 +1,39 @@
+/* --- existing theme + base --- */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* added semantic colors for the visualizer */
+  --cell-border: #e5e7eb;
+  --cell-wall: #1f2937;
+  --cell-visited: #93c5fd;
+  --cell-path: #60a5fa;
+  --cell-start: #22c55e;
+  --cell-goal: #ef4444;
+
+  --panel-border: #e5e7eb;
+  --panel-bg: #fafafa;
+  --button-bg: transparent;
+  --button-bg-active: #e5e7eb;
+  --button-border: #d1d5db;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+
+    --cell-border: #2a2a2a;
+    --cell-wall: #111827;
+    --cell-visited: #2563eb; /* slightly deeper for contrast */
+    --cell-path: #1d4ed8;
+    --cell-start: #16a34a;
+    --cell-goal: #dc2626;
+
+    --panel-border: #2a2a2a;
+    --panel-bg: #111111;
+    --button-bg-active: #1f2937;
+    --button-border: #303030;
   }
 }
 
@@ -36,7 +63,103 @@ a {
 }
 
 @media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+  html { color-scheme: dark; }
+}
+
+/* --- ADDED: visualizer UI styles --- */
+
+/* Controls toolbar */
+.controls {
+  display: grid;
+  grid-template-columns: 1.2fr 1.4fr 1fr auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto 16px auto;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+}
+
+.controls label {
+  font-weight: 600;
+  margin-right: 8px;
+  white-space: nowrap;
+}
+
+.controls .modes,
+.controls .algos,
+.controls .speed,
+.controls .resets {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.controls button,
+.controls select {
+  padding: 8px 12px;
+  border: 1px solid var(--button-border);
+  border-radius: 8px;
+  background: var(--button-bg);
+  color: inherit;
+  cursor: pointer;
+}
+
+.controls button.active {
+  background: var(--button-bg-active);
+}
+
+.controls input[type="range"] {
+  accent-color: var(--cell-path);
+}
+
+/* Grid */
+.grid {
+  display: inline-block;
+  border: 2px solid var(--panel-border);
+  border-radius: 6px;
+  user-select: none;
+}
+
+.row {
+  display: flex;
+}
+
+.cell {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--cell-border);
+  transition: background-color 120ms linear, box-shadow 120ms linear;
+}
+
+/* Cell states */
+.cell.wall   { background: var(--cell-wall); }
+.cell.visited{ background: var(--cell-visited); }
+.cell.path   { background: var(--cell-path); }
+.cell.start  { background: var(--cell-start); }
+.cell.goal   { background: var(--cell-goal); }
+
+/* Focus & hover affordances for accessibility */
+.cell:focus-visible {
+  outline: 2px solid var(--cell-path);
+  outline-offset: -2px;
+}
+
+.cell:hover {
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.12);
+}
+
+/* Small screens: compress spacing slightly */
+@media (max-width: 600px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+  .cell {
+    width: 18px;
+    height: 18px;
   }
 }
