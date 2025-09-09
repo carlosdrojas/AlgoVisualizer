@@ -1,3 +1,4 @@
+// pages/index.js
 import Head from "next/head";
 import { Geist, Geist_Mono } from "next/font/google";
 import styles from "@/styles/Home.module.css";
@@ -46,6 +47,11 @@ export default function Home() {
   }, []);
 
   function resetVisited() {
+    if (animRef.current) {
+      clearTimeout(animRef.current);
+      animRef.current = null;
+    }
+    setRunning(false);
     setGrid((g) => g.map(row => row.map(cell => ({ ...cell, visited: false, onPath: false }))));
   }
 
@@ -80,6 +86,7 @@ export default function Home() {
         ng[r][c].goal = true;
         goalRef.current = { r, c };
       } else {
+        // toggle wall unless start/goal
         if (!ng[r][c].start && !ng[r][c].goal) ng[r][c].wall = !ng[r][c].wall;
       }
       return ng;
@@ -117,10 +124,18 @@ export default function Home() {
         });
         animRef.current = setTimeout(step, speed);
       } else {
-        // reconstruct path
+        // ---- Unreachable-goal guard BEFORE reconstructing path ----
         const key = (n) => `${n.r},${n.c}`;
+        const goalKey = key(goalRef.current);
+        if (!parent[goalKey]) {
+          // No path found; just stop gracefully.
+          setRunning(false);
+          return;
+        }
+
+        // reconstruct path
         const path = [];
-        let curKey = key(goalRef.current);
+        let curKey = goalKey;
         while (parent[curKey]) {
           const [pr, pc] = parent[curKey].split(",").map(Number);
           path.push({ r: pr, c: pc });
@@ -157,6 +172,7 @@ export default function Home() {
           </p>
 
           <Controls
+            running={running}
             mode={mode}
             setMode={setMode}
             algo={algo}
