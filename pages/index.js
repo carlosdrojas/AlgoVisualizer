@@ -90,7 +90,7 @@ export default function Home() {
     setGrid((g) => {
       const ng = g.map((row) => row.map((cell) => ({ ...cell })));
       const cell = ng[r][c];
-      if (!cell.start && !cell.goal) cell.wall = true; // paint ON while dragging
+      if (!cell.start && !cell.goal) cell.wall = !cell.wall; // paint ON while dragging
       return ng;
     });
   }
