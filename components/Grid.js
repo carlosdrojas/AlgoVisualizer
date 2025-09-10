@@ -6,35 +6,43 @@ export default function Grid({ grid, mode, running, onCellClick, onWallPaint }) 
   const isDownRef = useRef(false);
 
   useEffect(() => {
-    const up = () => {
-      isDownRef.current = false;
-      setIsDown(false);
-    };
+    const up = () => { isDownRef.current = false; setIsDown(false); };
     window.addEventListener("mouseup", up);
     window.addEventListener("mouseleave", up);
+    window.addEventListener("touchend", up);
+    window.addEventListener("touchcancel", up);
     return () => {
       window.removeEventListener("mouseup", up);
       window.removeEventListener("mouseleave", up);
+      window.removeEventListener("touchend", up);
+      window.removeEventListener("touchcancel", up);
     };
   }, []);
 
   function handleMouseDown(r, c) {
     if (running) return;
-    isDownRef.current = true;
-    setIsDown(true);
-
-    if (mode === "wall") {
-      onWallPaint(r, c); // paint/toggle wall immediately on mousedown
-    } else {
-      onCellClick(r, c); // start/goal placement still via click
-    }
+    isDownRef.current = true; setIsDown(true);
+    if (mode === "wall") onWallPaint(r, c);
+    else onCellClick(r, c);
   }
 
   function handleMouseEnter(r, c) {
     if (running) return;
-    // only paint on drag while in wall mode
+    if (isDownRef.current && mode === "wall") onWallPaint(r, c);
+  }
+
+  // TOUCH: drag to draw walls; tap to place start/goal
+  function handleTouchStart(e, r, c) {
+    if (running) return;
+    isDownRef.current = true; setIsDown(true);
+    if (mode === "wall") { onWallPaint(r, c); e.preventDefault(); }
+    else onCellClick(r, c);
+  }
+  function handleTouchMove(e, r, c) {
+    if (running) return;
     if (isDownRef.current && mode === "wall") {
       onWallPaint(r, c);
+      e.preventDefault(); // reduce page scroll while drawing
     }
   }
 
@@ -57,6 +65,8 @@ export default function Grid({ grid, mode, running, onCellClick, onWallPaint }) 
               aria-label={`cell ${cell.r},${cell.c}`}
               onMouseDown={() => handleMouseDown(cell.r, cell.c)}
               onMouseEnter={() => handleMouseEnter(cell.r, cell.c)}
+              onTouchStart={(e) => handleTouchStart(e, cell.r, cell.c)}
+              onTouchMove={(e) => handleTouchMove(e, cell.r, cell.c)}
             />
           ))}
         </div>

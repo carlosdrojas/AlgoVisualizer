@@ -29,8 +29,8 @@ export default function Home() {
   const [grid, setGrid] = useState(emptyGrid());
   const [mode, setMode] = useState("wall"); // 'start' | 'goal' | 'wall'
   const [running, setRunning] = useState(false);
-  const [algo, setAlgo] = useState("bfs"); // 'bfs' | 'dfs'
-  const [speed, setSpeed] = useState(30); // ms per step
+  const [algo, setAlgo] = useState("bfs");
+  const [speed, setSpeed] = useState(30);
 
   const startRef = useRef({ r: 12, c: 6 });
   const goalRef = useRef({ r: 12, c: 18 });
@@ -46,19 +46,13 @@ export default function Home() {
   }, []);
 
   function resetVisited() {
-    if (animRef.current) {
-      clearTimeout(animRef.current);
-      animRef.current = null;
-    }
+    if (animRef.current) { clearTimeout(animRef.current); animRef.current = null; }
     setRunning(false);
     setGrid((g) => g.map((row) => row.map((cell) => ({ ...cell, visited: false, onPath: false }))));
   }
 
   function hardReset() {
-    if (animRef.current) {
-      clearTimeout(animRef.current);
-      animRef.current = null;
-    }
+    if (animRef.current) { clearTimeout(animRef.current); animRef.current = null; }
     setRunning(false);
     setGrid(emptyGrid());
     setTimeout(() => {
@@ -71,7 +65,6 @@ export default function Home() {
     }, 0);
   }
 
-  // Click handler (respects mode)
   function handleCellClick(r, c) {
     if (running) return;
     setGrid((g) => {
@@ -85,23 +78,19 @@ export default function Home() {
         ng[r][c].goal = true;
         goalRef.current = { r, c };
       } else {
-        // wall mode uses onWallPaint instead
         if (!ng[r][c].start && !ng[r][c].goal) ng[r][c].wall = !ng[r][c].wall;
       }
       return ng;
     });
   }
 
-  // Drag painting walls only (never moves start/goal)
+  // Draw walls (mouse drag / touch move)
   function onWallPaint(r, c) {
     if (running) return;
     setGrid((g) => {
       const ng = g.map((row) => row.map((cell) => ({ ...cell })));
       const cell = ng[r][c];
-      if (!cell.start && !cell.goal) {
-        cell.wall = !cell.wall; // force paint "on" while dragging
-        // If you'd prefer toggling while dragging, use: cell.wall = !cell.wall;
-      }
+      if (!cell.start && !cell.goal) cell.wall = true; // paint ON while dragging
       return ng;
     });
   }
@@ -137,13 +126,9 @@ export default function Home() {
         });
         animRef.current = setTimeout(step, speed);
       } else {
-        // unreachable-goal guard
         const key = (n) => `${n.r},${n.c}`;
         const goalKey = key(goalRef.current);
-        if (!parent[goalKey]) {
-          setRunning(false);
-          return;
-        }
+        if (!parent[goalKey]) { setRunning(false); return; }
 
         // reconstruct path
         const path = [];
@@ -178,8 +163,8 @@ export default function Home() {
 
       <div className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}>
         <main className={styles.main}>
-          <h1 style={{ marginBottom: 8 }}>Algorithms Visualizer</h1>
-          <p style={{ opacity: 0.7, marginTop: 0, marginBottom: 16 }}>
+          <h1 style={{ marginBottom: 8, fontSize: "clamp(1.4rem, 3vw, 2rem)" }}>Algorithms Visualizer</h1>
+          <p style={{ opacity: 0.7, marginTop: 0, marginBottom: 16, fontSize: "clamp(.9rem, 2.5vw, 1rem)" }}>
             Next.js + Node.js API routes (BFS / DFS) + React UI
           </p>
 
@@ -197,7 +182,8 @@ export default function Home() {
             onHardReset={hardReset}
           />
 
-          <div style={{ marginTop: 12 }}>
+          {/* Auto-fit square grid */}
+          <div className="grid-wrapper">
             <Grid
               grid={grid}
               mode={mode}
@@ -207,16 +193,10 @@ export default function Home() {
             />
           </div>
 
-          <p style={{ marginTop: 12, opacity: 0.7 }}>
-            Tip: switch modes to set <b>Start</b>/<b>Goal</b> or hold the mouse to <b>draw Walls</b>, then run BFS/DFS.
+          <p style={{ marginTop: 12, opacity: 0.7, fontSize: "clamp(.85rem, 2.3vw, .95rem)" }}>
+            Tip: set <b>Start</b>/<b>Goal</b>, then tap or drag to draw <b>Walls</b>, and run BFS/DFS.
           </p>
         </main>
-
-        <footer className={styles.footer}>
-          <a href="https://nextjs.org/learn" target="_blank" rel="noopener noreferrer">Learn</a>
-          <a href="https://vercel.com/templates?framework=next.js" target="_blank" rel="noopener noreferrer">Templates</a>
-          <a href="https://nextjs.org" target="_blank" rel="noopener noreferrer">nextjs.org →</a>
-        </footer>
       </div>
     </>
   );
