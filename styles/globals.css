@@ -1,10 +1,10 @@
 /* THEME */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --foreground: #ededed;
 
   /* visualizer colors */
-  --cell-border: #e5e7eb;
+  --cell-border: #2a2a2a;
   --cell-wall: #6b21a8;     /* high-contrast walls */
   --cell-visited: #8ec5ff;  /* light blue */
   --cell-path: #f59e0b;     /* bright amber */
@@ -20,7 +20,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    -background: #0a0a0a;
+    --background: #0a0a0a;
     --foreground: #ededed;
 
     --cell-border: #2a2a2a;
