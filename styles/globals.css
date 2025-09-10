@@ -5,7 +5,7 @@
 
   /* visualizer colors */
   --cell-border: #e5e7eb;
-  --cell-wall: #000000;     /* high-contrast walls */
+  --cell-wall: #6b21a8;     /* high-contrast walls */
   --cell-visited: #8ec5ff;  /* light blue */
   --cell-path: #f59e0b;     /* bright amber */
   --cell-start: #16a34a;
@@ -20,10 +20,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    -background: #0a0a0a;
     --foreground: #ededed;
 
     --cell-border: #2a2a2a;
+    --cell-wall: #4c1d95;   /* deeper purple walls (dark mode) */
+    --cell-visited: #3b82f6;  /* strong blue */
+    --cell-path: #f59e0b;     /* amber */
+    --cell-start: #16a34a;
+    --cell-goal: #dc2626;
+
     --panel-border: #2a2a2a;
     --panel-bg: #111111;
     --button-bg-active: #1f2937;
